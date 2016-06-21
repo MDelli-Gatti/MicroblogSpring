@@ -23,7 +23,7 @@
 </form>
 <br>
 Hello, {{username}}!
-{{/user}}
+
 
 <ol>
 {{#messages}}
@@ -33,8 +33,14 @@ Hello, {{username}}!
         <input type="hidden" name="id" value="{{id}}"/>
         <button type="submit">Delete Message</button>
         </form>
+        <form action="/edit-message" method="post" style="display: inline-block">
+            <input type="hidden" name="id" value="{{id}}">
+            <input type="text" name="text" placeholder="Edit your message">
+            <button type="submit">Edit</button>
+        </form>
     </li>
 {{/messages}}
 </ol>
+{{/user}}
 </body>
 </html>

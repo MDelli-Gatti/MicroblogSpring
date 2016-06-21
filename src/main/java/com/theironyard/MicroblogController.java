@@ -1,5 +1,6 @@
 package com.theironyard;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +15,9 @@ import java.util.ArrayList;
 @Controller
 public class MicroblogController {
 
-    ArrayList<Message> messages = new ArrayList<>();
+    @Autowired
+    MessageRepository messages;
+
 
     @RequestMapping(path = "/", method = RequestMethod.GET)
         public String home(Model model, HttpSession session) {
@@ -24,7 +27,8 @@ public class MicroblogController {
             user = new User(username);
         }
         model.addAttribute("user", user);
-        model.addAttribute("messages", messages);
+        Iterable<Message> msgs = messages.findAll();
+        model.addAttribute("messages", msgs);
         return "home";
     }
 
@@ -35,22 +39,29 @@ public class MicroblogController {
     }
 
     @RequestMapping(path = "/add-message", method = RequestMethod.POST)
-    public String addMessage(String text, Integer id){
-        id = messages.size() + 1;
-        Message m = new Message(id, text);
-        messages.add(m);
+    public String addMessage(String text){
+        Message m = new Message(text);
+        messages.save(m);
         return "redirect:/";
     }
 
     @RequestMapping(path = "/delete-message", method = RequestMethod.POST)
     public String deleteMessage(Integer id){
-        messages.remove(id - 1);
+        messages.delete(id);
         return "redirect:/";
     }
 
     @RequestMapping(path = "/logout", method = RequestMethod.POST)
     public String logout(HttpSession session){
         session.invalidate();
+        return "redirect:/";
+    }
+
+    @RequestMapping(path = "/edit-message", method = RequestMethod.POST)
+    public String edit(Integer id, String text){
+        Message m = messages.findOne(id);
+        m.setText(text);
+        messages.save(m);
         return "redirect:/";
     }
 }
